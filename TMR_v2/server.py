@@ -1,3 +1,4 @@
+from xmlrpc.client import boolean
 from flask import Flask, request, render_template
 import random
 import time
@@ -24,7 +25,7 @@ def my_link():
     app=firebase_admin.initialize_app(login)
     db=firestore.client()
     
-    def getData(url)->list:
+    def getData(url,index)->list:
         data = []
         #Start web browser driver to emulate a real browser visiting the site to avoid captcha or bot recognition
         browser_options = ChromeOptions()
@@ -56,7 +57,8 @@ def my_link():
             jobInfo = {
                 'title':title.text,
                 'Company':company.text,
-                'salary':salary.text
+                'salary':salary.text,
+                'index':index
             }
 
             #Save the data to the database
@@ -64,7 +66,9 @@ def my_link():
             doc_ref.set({ 
                 'title':title.text,
                 'Company':company.text,
-                'salary':salary.text})
+                'salary':salary.text,
+                'index':index})
+            
 
             #Data added
             data.append(jobInfo)
@@ -72,16 +76,54 @@ def my_link():
         driver.quit()
         return data
     
+    def check_db(txt)->boolean:#checkls the database if a givinen txt is in the job index returns boolean
+        jobs = db.collection('Job Index').stream()
+        for job in jobs:
+            holder=job.to_dict()
+            print(holder.get('title'))
+            if holder.get('title')==txt:
+                print('ture')
+                return True
+        print('flase')
+        return False
+
+    def count_db()->int:
+        holder=0
+        jobs= db.collection('Job Index').stream()
+        for job in jobs:
+            holder+=1
+        return holder+1
 
     def main():
         data = []
         text = request.form['text']
         text = text.replace(" ","-")
+        doc_ref=db.collection('Job Index').document(text)
+        count=0
+        index=0
+        if check_db(text):#check to see if the  search text is already in the database if true get the # of listings 
+           new_ref=db.collection('Job Index').stream()
+           for job in new_ref:
+               holder=job.to_dict()
+               if holder.get('title')==text:
+                 count=holder.get('number of listings')
+                 index=holder.get('index')
+        else:
+            
+            index=count_db()
+
+        #print('count:'+count+'index'+index)
         for i in range(3):
-            data += getData("https://www.indeed.com/q-" + text + "-jobs.html")
+            data += getData(("https://www.indeed.com/q-" + text + "-jobs.html"),index)
+            count+=len(data)
             #pausing for random amount of time to emulate real user
             time.sleep(random.random())
-    
+        #wirte the search to the database 
+        doc_ref.set({
+            'title':text,
+            'number of listings':count,
+            'index':index
+        })    
         #Converting raw data to a csv file which organizes data cleanly in a file that can be viewed in google sheets
         df = pd.DataFrame(data)
         print(df.head())
