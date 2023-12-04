@@ -1,3 +1,4 @@
+from turtle import setundobuffer
 from xmlrpc.client import boolean
 from flask import Flask, request, render_template, jsonify
 import random
@@ -14,7 +15,7 @@ db_instance = None
 data = [] #Defined the data var at the beignning 
 
 # Firebase authentication
-c_path= r"TMRWebScrape-main\TMRWebScrape-main\TMR_v2\tmr-project-8f8de-firebase-adminsdk-8xj0a-4696ee732a.json"
+c_path= r"/Users/tylerbaudier/Downloads/TMRWebScrape-main/TMR_v2/tmr-project-8f8de-firebase-adminsdk-8xj0a-4696ee732a.json"
 login=credentials.Certificate(c_path)
 firebase_app=firebase_admin.initialize_app(login)
 db=firestore.client()
@@ -31,12 +32,11 @@ def get_data():
 # Created this function to retrieve job information data from Firebase
 def get_job_info_data():
     job_info_data = []
-    job_info_collection = db.collection('new_web_data').stream()
+    job_info_collection = db.collection('Job Index').stream()
 
     for job_info_doc in job_info_collection:
         job_info = job_info_doc.to_dict()
         job_info_data.append(job_info)
-
     return job_info_data
 
 # Route to handle the web scrapping process
@@ -125,7 +125,7 @@ def my_link():
         doc_ref=db.collection('Job Index').document(text)
         count=0
         index=0
-
+        stuff=get_job_info_data
         if check_db(text):#check to see if the  search text is already in the database if true get the # of listings 
            new_ref=db.collection('Job Index').stream()
            for job in new_ref:
