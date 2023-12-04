@@ -1,28 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title> TMR </title>
-        <link rel="icon" href="apmtn-dpqbl-001.ico"/>
-        <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title> TMR </title>
+    <link rel="icon" href="apmtn-dpqbl-001.ico" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
-    </head>
-    <body>
-        <div class="head">
-            <ul class="headlist">
-                <li><a href="#">未定</a></li>
-                <li><a href="#">未定</a></li>
-                <li><a href="#">未定</a></li>
-                <li><a href="#">未定</a></li>
-            </ul>
-        </div>
-        <form method="POST">
-            <input name="text">
-            <input type="submit">
-        </form>
-    </body>
+</head>
+
+<body>
+    <!--This will be the header of the webpage-->
+    <div class="head">
+        <!--Used an unordered list to organize the features-->
+        <ul class="headlist">
+            <li><a href="#">未定</a></li>
+            <li><a href="#">未定</a></li>
+            <li><a href="#">未定</a></li>
+            <li><a href="#">未定</a></li>
+        </ul>
+    </div>
+    <!--This is a form where the input box and button is stored to submit a search query-->
+    <form method="POST" action="{{ url_for('my_link') }}">
+        <input id="searchInput" name="text">
+        <input type="submit">
+    </form>
+    <!-- This will be the table for displaying job infromation using Flask template-->
+    <table>
+        <thead>
+            <tr>
+                <th>Index</th>
+                <th> Tittles </th>
+                <th>Company </th>
+                <th> Salary</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!--Using a jinja template in order to loop through the job data from the serverside data and display it in rows-->
+            {% for job_info in data %}
+            <tr>
+                <td>{{job_info.index}}</td>
+                <td>{{ job_info.title }}</td>
+                <td>{{ job_info.Company }}</td>
+                <td>{{ job_info.salary }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- In order to render a chart with chart.js you will need a canvas-->
+    <canvas id="myChart" width="400" height="200"></canvas>
+
+    <!-- <script>
+        // Fetch data from the server
+        fetch('/get_data')
+            .then(response => response.json())
+            .then(jobInfoData => {
+                // Formatting data for the chart
+                var chartData = {
+                    labels: jobInfoData.map(job_info => job_info.titel),
+                    datasets: [{
+                        label: 'Salary',
+                        data: jobInfoData.map(job_info => job_info.salary),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                };
+
+                // Creating the chart
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+    </script> -->
+</body>
+
 </html>
