@@ -104,9 +104,9 @@ def my_link():
             holder=job.to_dict()
             print(holder.get('title'))
             if holder.get('title')==txt:
-                print('ture')
+                #print('ture')
                 return True
-        print('flase')
+        #print('flase')
         return False
 
     #This function will count the number of job index's in the database
@@ -125,7 +125,6 @@ def my_link():
         doc_ref=db.collection('Job Index').document(text)
         count=0
         index=0
-        stuff=get_job_info_data
         if check_db(text):#check to see if the  search text is already in the database if true get the # of listings 
            new_ref=db.collection('Job Index').stream()
            for job in new_ref:
